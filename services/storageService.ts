@@ -1,10 +1,6 @@
 import { Employee } from '../types';
 
 const DB_KEY = 'digital_business_cards_db';
-const CHANNEL_NAME = 'employee_updates_channel';
-
-// Create a BroadcastChannel to communicate between tabs/windows of the same origin.
-const channel = new BroadcastChannel(CHANNEL_NAME);
 
 const getInitialData = (): Employee[] => {
     return [
@@ -44,7 +40,6 @@ const getInitialData = (): Employee[] => {
     ];
 }
 
-
 export const getEmployees = (): Employee[] => {
     try {
         const data = localStorage.getItem(DB_KEY);
@@ -56,35 +51,14 @@ export const getEmployees = (): Employee[] => {
         return JSON.parse(data);
     } catch (error) {
         console.error("Failed to parse employees from localStorage", error);
-        return [];
+        return getInitialData(); // Fallback to initial data on parse error
     }
 };
 
 export const saveEmployees = (employees: Employee[]): void => {
     try {
         localStorage.setItem(DB_KEY, JSON.stringify(employees));
-        // Notify other tabs that the data has changed.
-        channel.postMessage({ type: 'data_changed' });
     } catch (error) {
         console.error("Failed to save employees to localStorage", error);
     }
-};
-
-/**
- * Subscribes to data change events from other tabs.
- * @param callback The function to call when data changes.
- * @returns A function to call to unsubscribe from the events.
- */
-export const subscribeToUpdates = (callback: () => void): (() => void) => {
-    const messageHandler = (event: MessageEvent) => {
-        if (event.data && event.data.type === 'data_changed') {
-            callback();
-        }
-    };
-    channel.addEventListener('message', messageHandler);
-
-    // Return an unsubscribe function for cleanup.
-    return () => {
-        channel.removeEventListener('message', messageHandler);
-    };
 };

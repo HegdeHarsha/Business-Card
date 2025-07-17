@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useEmployees } from '../contexts/EmployeeContext';
 import EmployeeCard from '../components/EmployeeCard';
 import { Employee } from '../types';
-import { PhoneIcon, MailIcon, GlobeIcon, XIcon } from '../components/icons';
+import { PhoneIcon, MailIcon, GlobeIcon, XIcon, RefreshCwIcon } from '../components/icons';
 
 const EmployeeDetailModal: React.FC<{ employee: Employee; onClose: () => void }> = ({ employee, onClose }) => {
     const [isClosing, setIsClosing] = useState(false);
@@ -87,7 +87,7 @@ const EmployeeDetailModal: React.FC<{ employee: Employee; onClose: () => void }>
 };
 
 const Dashboard: React.FC = () => {
-  const { employees, isLoading } = useEmployees();
+  const { employees, isLoading, isSheetMode, syncFromSheet, error } = useEmployees();
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   if (isLoading) {
@@ -96,7 +96,26 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold text-brand-dark mb-6">Employee Card Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+        <div>
+            <h1 className="text-3xl font-bold text-brand-dark">Employee Card Dashboard</h1>
+            <p className="text-gray-500 mt-1">
+              Data source: {isSheetMode ? 'Google Sheet (Read-only)' : 'Local Storage'}
+            </p>
+        </div>
+        {isSheetMode && (
+          <button 
+            onClick={syncFromSheet} 
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center gap-2"
+          >
+            <RefreshCwIcon className="w-5 h-5" />
+            Sync from Sheet
+          </button>
+        )}
+      </div>
+
+      {error && <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert"><p>{error}</p></div>}
+      
       {employees.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {employees.map(employee => (
@@ -110,7 +129,9 @@ const Dashboard: React.FC = () => {
       ) : (
         <div className="text-center p-10 bg-white rounded-lg shadow">
           <h2 className="text-xl font-semibold">No employee cards found.</h2>
-          <p className="text-gray-500 mt-2">Get started by adding a new employee card.</p>
+          <p className="text-gray-500 mt-2">
+            {isSheetMode ? 'Check your Google Sheet for data or try syncing.' : 'Get started by adding a new employee card.'}
+          </p>
         </div>
       )}
       {selectedEmployee && (

@@ -10,7 +10,7 @@ interface EmployeeCardProps {
 }
 
 const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onCardClick }) => {
-  const { deleteEmployee } = useEmployees();
+  const { deleteEmployee, isSheetMode } = useEmployees();
   const [showCopied, setShowCopied] = useState(false);
 
   const handleDelete = () => {
@@ -30,7 +30,7 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onCardClick }) =>
     <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300 ease-in-out flex flex-col">
       <div className="p-5 cursor-pointer flex-grow" onClick={onCardClick}>
         <div className="flex items-center space-x-4">
-          <img className="w-16 h-16 rounded-full object-cover" src={employee.photoUrl} alt={employee.name} />
+          <img className="w-16 h-16 rounded-full object-cover" src={employee.photoUrl || 'https://picsum.photos/seed/placeholder/400'} alt={employee.name} />
           <div>
             <h3 className="text-xl font-bold text-brand-dark">{employee.name}</h3>
             <p className="text-gray-600">{employee.title}</p>
@@ -43,12 +43,16 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onCardClick }) =>
           <Share2Icon className="w-5 h-5" />
            {showCopied && <span className="absolute -top-7 right-0 bg-black text-white text-xs rounded-md px-2 py-1">Copied!</span>}
         </button>
-        <Link to={`/edit/${employee.id}`} className="p-2 text-gray-500 hover:text-yellow-600 transition-colors duration-200" title="Edit Card">
-          <EditIcon className="w-5 h-5" />
-        </Link>
-        <button onClick={handleDelete} className="p-2 text-gray-500 hover:text-red-600 transition-colors duration-200" title="Delete Card">
-          <Trash2Icon className="w-5 h-5" />
-        </button>
+        {!isSheetMode && (
+          <>
+            <Link to={`/edit/${employee.id}`} className="p-2 text-gray-500 hover:text-yellow-600 transition-colors duration-200" title="Edit Card">
+              <EditIcon className="w-5 h-5" />
+            </Link>
+            <button onClick={handleDelete} className="p-2 text-gray-500 hover:text-red-600 transition-colors duration-200" title="Delete Card">
+              <Trash2Icon className="w-5 h-5" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

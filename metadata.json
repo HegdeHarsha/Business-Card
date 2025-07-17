@@ -1,5 +1,5 @@
-
 {
   "name": "Digital Business Card Manager",
-  "description": "A centralized platform for an IT team to create, manage, and share digital business cards for all employees. Each card has a unique, shareable link."
+  "description": "A centralized platform for an IT team to create, manage, and share digital business cards for all employees. Each card has a unique, shareable link.",
+  "requestFramePermissions": []
 }
